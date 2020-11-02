@@ -1,0 +1,385 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.kaiostech.git</groupId>
+    <artifactId>bd_streamer_dl3</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>bd_streamer_dl3</name>
+    <url>https://git.kaiostech.com</url>
+
+    <profiles>
+        <profile>
+            <id>Unix Properties</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <properties>
+                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+                <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+                <script.extension>.sh</script.extension>
+                <hbase.version>1.2.1</hbase.version>
+                <jackson.version>2.7.4</jackson.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>Unix Tools Jar</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+                <file>
+                    <exists>${java.home}/../lib/tools.jar</exists>
+                </file>
+            </activation>
+            <properties>
+                <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
+            </properties>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.kaiostech</groupId>
+            <artifactId>kc_common</artifactId>
+            <version>1.0.67</version>
+        </dependency>
+
+        <!-- to marshal/unmarshal objects. -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.6</version>
+        </dependency>
+
+        <!-- for CBOR marshal/unmarshal support -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-cbor</artifactId>
+            <version>2.7.9</version>
+        </dependency>
+
+        <!-- below are dependencies to support above library ... -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.7.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.7.9.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.7.9</version>
+        </dependency>
+
+        <!-- to read configuration files. -->
+        <dependency>
+            <groupId>com.moandjiezana.toml</groupId>
+            <artifactId>toml4j</artifactId>
+            <version>0.7.2</version>
+        </dependency>
+
+        <!-- to connect with the NATS message queue system. -->
+        <dependency>
+            <groupId>io.nats</groupId>
+            <artifactId>jnats</artifactId>
+            <version>2.4.6</version>
+        </dependency>
+
+        <!-- to use lz4 (fast) compression/decompression for transmitting data over Messaging Queue. -->
+        <dependency>
+            <groupId>net.jpountz.lz4</groupId>
+            <artifactId>lz4</artifactId>
+            <version>1.3.0</version>
+        </dependency>
+
+        <!-- to use SeaWeedFS temporary storage when transmitting big data over Messaging Queue. -->
+        <dependency>
+            <groupId>org.lokra.seaweedfs</groupId>
+            <artifactId>seaweedfs-client</artifactId>
+            <version>0.7.3.RELEASE</version>
+        </dependency>
+
+        <!-- to use Minio client (an S3 compatible client). -->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+
+        <!-- to use log4j v2 logging system. -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.11.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.11.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.11.2</version>
+        </dependency>
+        <!-- Cassandra client (for compilation only) -->
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-core</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-mapping</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-extras</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+
+        <!-- We now need FERNET to encrypt/decrypt sensitive data store in Cassandra. -->
+        <dependency>
+            <groupId>com.macasaet.fernet</groupId>
+            <artifactId>fernet-java8</artifactId>
+            <version>1.3.6</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.9.9</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.netty/netty-common -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <version>4.0.56.Final</version>            <!-- Fernando M: Had to change netty version because it was giving conflicts when running JUnit tests -->
+            <!-- <version>4.1.24.Final</version> -->
+        </dependency>
+
+		<dependency>
+		  <groupId>io.netty</groupId>
+		  <artifactId>netty-transport-native-epoll</artifactId>
+		  <version>4.0.56.Final</version>
+		  <classifier>linux-x86_64</classifier>
+		</dependency>
+		
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>28.1-jre</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.codahale.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+
+
+        <!-- for Unit testing ... -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- The junit-jupiter-engine (version 5.1.0) dependency contains the implementation of the JUnit Jupiter test engine. 
+            This dependency is required only at runtime. -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- The junit-vintage-engine (version 5.1.0) dependency adds support for unit tests that use JUnit 4 or JUnit 3. 
+            Again, this dependency is required only at runtime. -->
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>5.1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- The junit-platform-launcher (version 1.1.0) dependency provides a public API for configuring and launching tests. 
+            This API is typically used by IDEs and build tools. -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>1.1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- The junit-platform-runner (version 1.1.0) dependency allows us to run tests and test suites in a JUnit 4 environment. -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-runner</artifactId>
+            <version>1.1.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>1.6.6</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <version>1.6.6</version>
+            <scope>test</scope>
+        </dependency>
+        
+    </dependencies>
+
+    <build>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                    <exclude>scripts/post_install.*</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <!--
+    -->
+        <pluginManagement>
+            <plugins>
+
+                <!-- RS - 5/23/2016 - Using the Plexus compiler of Eclipse in order 
+                    to show some additional warnings and perform additional sanity
+                    checks not available with the javac compiler.
+                    
+                        We want high quality code so we need to have maximum checks.
+                    
+                        The below block is the original compiler block. We keep it in
+                    case we need to rollback for some specific and urgent cases.
+                -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.3</version>
+                    <configuration>
+                        <compilerId>eclipse</compilerId>
+                        <compilerVersion>1.8</compilerVersion>
+                        <!-- <verbose>true</verbose> -->
+                        <source>1.8</source>
+                        <target>1.8</target>
+                        <optimize>true</optimize>
+                        <debug>true</debug>
+                        <debuglevel>lines,vars,source</debuglevel>
+                        <showDeprecation>true</showDeprecation>
+                        <showWarnings>true</showWarnings>
+                        <compilerArgs>
+                            <arg>-Xmaxerrs</arg>
+                            <arg>30</arg>
+                            <arg>-Xlint:all</arg>
+                            <arg>-Werror</arg>
+                        </compilerArgs>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.plexus</groupId>
+                            <artifactId>plexus-compiler-eclipse</artifactId>
+                            <version>2.7</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
+                <!-- Added by Raffi to delete all Emacs's generated backup files and log files. *~ -->
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.0.0</version>
+                    <configuration>
+                        <filesets>
+                            <fileset>
+                                <directory>.</directory>
+                                <includes>
+                                    <include>**/*~</include>
+                                    <include>**/*.log.*</include>
+                                </includes>
+                                <followSymlinks>false</followSymlinks>
+                            </fileset>
+                        </filesets>
+                    </configuration>
+                </plugin>
+
+                <!-- Raffi via Eclipse 
+                    This plugin's configuration is used to store Eclipse m2e settings only. 
+                    It has no influence on the Maven build itself.
+                    This is to correct a complaint from Eclipse when using the original POM 
+                    in Eclipse.
+                -->
+
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-compiler-plugin</artifactId>
+                                        <versionRange>[3.3,)</versionRange>
+                                        <goals>
+                                            <goal>compile</goal>
+                                            <goal>testCompile</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.19.1</version>
+                    <configuration>
+                        <testFailureIgnore>true</testFailureIgnore>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.junit.platform</groupId>
+                            <artifactId>junit-platform-surefire-provider</artifactId>
+                            <version>1.1.0</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.junit.jupiter</groupId>
+                            <artifactId>junit-jupiter-engine</artifactId>
+                            <version>5.1.0</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
+            </plugins>
+
+        </pluginManagement>
+        <!--
+    -->
+    </build>
+
+</project>

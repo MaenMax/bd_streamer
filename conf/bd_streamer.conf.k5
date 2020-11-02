@@ -1,0 +1,516 @@
+[Common]
+
+	# No creds required for app list.
+	NoCred4AC=false
+
+    #Version of this API Instance
+    Version="v3.0"
+
+	# Name of the resource server.
+	# This value will be used inside the JWT for
+	# the audience. All JWT coming to the resource
+	# server MUST have its 'Audience' field set
+	# with the value below.
+	ResourceServerName="api.kaiostech.com"
+
+	ServicesServerName="services.kaiostech.com"
+	
+	# Name of the Authorization server.
+	# This value will be used inside the JWT for
+	# both the audience (for refresh token) and
+	# issuer (for access token).
+	# All refresh token coming to the authorization
+	# server MUST have its 'Audience' field set
+	# with the value below.
+	AuthServerName="auth.kaiostech.com"
+
+	# Flag to control whether or not to output all
+	# the debug log. Actually, the output is controlled
+	# in two places. Both need to be activated  in order
+	# to have the debug output:
+	# 1. The log4go XML configuration file. The Debug
+	#    output level should be activated.
+	# 2. The Debug flag below.
+	#
+	# The reason to add this flag is for code optimization
+	# (i.e. execution speed/memory usage) in Golang as
+	# the log4go doesn't support the isDebugEnable method
+	# like log4j in Java.
+	#
+	# Indeed, despite the debug output being  controlled
+	# by the XML configuration file of log4go, it won't
+	# prevent all the processing power required to prepare
+	# these logs since logging requires concatenating
+	# strings together just to drop them in the end if
+	# debug is not the active output level. So one can
+	# surround these log output preparation by a test of
+	# the below flag to avoid computing them when not required.
+	#
+	# Example:
+	#
+	# if config.GetFEConfig().Common.Debug {
+	#    l4g.Debug(fmt.Sprintf("#%v: Value of (x=%v, y=%v, z=%v) lead to err '%s'",thread_id, x, y, z,err.Error()))
+	# }
+	#
+	# In production, this flag should be set to false.
+	# However, if debugging a specific problem, it can
+	# safely be set to true at a cost of higher CPU/Memory/I/O
+	# resources consumption.
+	Debug=true
+
+	# Flag to control whether the Test mode should be active
+	# or not.
+	# When the Test mode is active, emails and SMS for account
+	# activation or password reset are not actually sent. Instead,
+	# they are saved into a Redis database so that the testing client
+	# can retrieve these values automatically and interact with
+	# the server without human intervention.
+	# This is basically used for Functional & Regression testing
+	# as well as performance testing.
+	#
+	# In production, this flag MUST be set to false.
+	Test=false
+
+    # Flag to control whether cumulis is going to enable the routes for payments:
+	#	- /purchases
+	#	- /payment_methods
+    PaymentsEnabled=false
+
+    # Flag to control whether cumulis is going to enable the routes for payments:
+    #   - /products
+	#	- /purchases
+	#	- /payment_methods
+    PaymentsEnabled=true
+
+    # Percentage of memory allowed to be consumed before too many requests http code 429
+    # is returned to requests.
+    Percentage_Mem_Allowed = 90
+
+[FrontLayer]
+    # Maximum number of accepted concurrent request processing (goroutine)
+	MaxActiveRequest=1000
+
+    # If true, all requests deemed heavy on system resources will be sent to the LL layer in a sep queue.
+    # At least one LL node must be setup to process auth requests. (see Process_Only_Heavy_Requests)
+	Heavy_Load_Channel = false
+
+	#  Domain name that the service is supposed to serve.
+    #  Any request received on another domain name than the
+    #  one provided will be refused.
+	DefaultEP = [ "api.kaiostech.com" ]
+	LBSEP = [ "api.kaiostech.com", "lbs.kaiostech.com" ]
+	StorageEP = [ "api.kaiostech.com", "storage.kaiostech.com", "services.kaiostech.com" ]
+	PushEP = [ "api.kaiostech.com", "push.kaiostech.com", "push.kaiostech.com" ]
+
+    #  TCP/IP Port to listen to for the HTTP service.
+    #
+    #  Put 0 to disable HTTP service.
+	HttpPort = 8080
+
+    #  TCP/IP Port to listen to for the HTTPS service.
+    #
+    #  Put 0 to disable HTTPS service.
+	HttpsPort = 0
+
+    #  TCP/IP Port to listen to for the Detect Portal service.
+    #
+    #  Put 0 to disable.
+	PortalHttpPort = 0
+
+    #  X509 Certificate to use for the HTTPS service.
+    #
+    #  NOTE: Ignored if HttpsPort is set to 0.
+    CertX509File = [ "/etc/letsencrypt/live/kaiostech.com/fullchain.pem" ]
+
+    #  X509 Certificate private key to use for the HTTPS service.
+    #
+    #  NOTE: Ignored if HttpsPort is set to 0.
+    CertKeyFile = [ "/etc/letsencrypt/live/kaiostech.com/privkey.pem" ]
+
+    #  X509 Root Certificates to use for the HTTPS service.
+    #
+    #  NOTE: Ignored if HttpsPort is set to 0.
+    RootCA = [ "conf/root_ca/root.pem", "conf/root_ca/x3.pem", "conf/root_ca/x4.pem" ]
+
+    # Time to cache apps in local memory
+    Local_App_Cache_Sec = 600
+
+	Max_Head_Stack_MB = 1500
+
+    # BASE URLS VALUES FOR V2
+    # [FrontLayer.ServiceCenter.BaseURLs]
+    #        # Setup base url for apps and artifacts.
+    #        DeviceArtifactBaseUrl = "https://storage.kaiostech.com/v2.0/files/app"
+    #        DeviceZipBaseUrl = "https://storage.kaiostech.com/v2.0/files/app"
+    #        ManifestBaseUrl = "https://api.kaiostech.com/v2.0/"
+    [FrontLayer.ServiceCenter]
+            PlusInfoVersion = "0.0.3"
+       		CorePartner = "WSZuGZmnVDnf1ncp6T5f"
+
+    # BASE URLS VALUES FOR V3
+    [FrontLayer.ServiceCenter.BaseURLs]
+            # Setup base url for apps and artifacts.
+            DeviceArtifactBaseUrl = "https://storage.kaiostech.com/v3.0/files/app"
+            # URL for Free Apps
+            DeviceZipBaseUrl = "https://storage.kaiostech.com/v3.0/files/zip"
+            # URL for Paid Apps, manifest.package_url,  INCLUDE ../{app_id}
+            PaidAppDownloadBaseURL = "https://storage.kaiostech.com/v3.0/files/purchases/apps/{app_id}"
+            ManifestBaseUrl = "https://api.kaiostech.com/"
+    [FrontLayer.ServiceCenter.Cache]
+        # Number of seconds to keep locally cached apps.
+        Apps_TTL = 650
+        # Number of seconds to keep locally cached manifests.
+        Manifests_TTL = 650
+
+        Request_Buffer_Size = 1000
+        # In milliseconds
+        Retry_On_Error_Time = 10000
+
+        # In milliseconds
+        Refresh_Period = 200000
+
+	    Scheduler = "absolute"
+
+        # Filtering_HNI specific wheter to obtain the mcc/mnc values from the current network or the sim card.
+	    # Posible values = "sim", "network"
+	    # This values are used when processing the request trying to fetch the apps
+	    Filtering_HNI = "sim"
+
+[LogicLayer]
+    # Maximum number of accepted concurrent request processing (goroutine)
+	MaxActiveRequest=200
+
+	Process_Only_Heavy_Requests = false
+
+	KaiOSPushUrl = "https://push.kaiostech.com:8443"
+
+	User_Trail_Log = "user_trail.log"
+
+	Max_Head_Stack_MB = 4000
+
+	EmailVerificationExpiry = 1440
+
+    AppIdDeactivateAntitheft = "kNpFU6NavpPh4e5qnlFz" 
+ 
+	[LogicLayer.Payment]
+        # TTL for Orders created on a Purchase Intent, in seconds
+        # 10 minutes
+        PurchaseIntentTTL = 600
+        # Payment Authentication Token TTL in seconds
+        AuthTokenTTL = 600 # 10 minutes
+        # Payment Authentication Token TTL of transactions made by SMS in secods
+        AuthSMSTokenTTL = 86400 # 24 hrs
+        
+        VerifyURL = "https://api.kaiostech.com/v3.0/purchases/{transaction}/verify"
+        # Authorize Purchase using password? (POST /purchases/{transaction}/tokens) 
+        AuthWithPassword = false
+
+	[LogicLayer.W3C]
+        	# W3C Push message TTL
+	        Msg_TTL = "2592000s"
+
+        	[LogicLayer.W3C.Vapid]
+    
+	        # Vapid is activated only and only if both private and public key files are specified.
+	        # They should point to a key pair in PEM format and can be generated as below:
+        	
+	       # Private Key:
+	       # openssl ecparam -name prime256v1 -genkey -noout -out vapid_private.pem
+	       #
+	       # Public Key (note we use the previously generated private key):
+	       # openssl ec -in vapid_private.pem -pubout -out vapid_public.pem
+	       Vapid_PrivKey = "conf/antitheft_vapid_private.pem"
+	       Vapid_PubKey  = "conf/antitheft_vapid_public.pem"
+
+        	# Audience to be put into the Vapid JWT token.
+	       Vapid_Audience = "push.kaiostech.com"
+        
+        	# Duration of the Vapid JWT token.
+	       Vapid_TTL = "3600s"
+
+        	# Subject (usually email address or URL of the application server) to be put into the Vapid JWT token.
+	       Vapid_Subject = "https://services.kaiostech.com/antitheft"
+
+[DataLayer]
+    # Maximum number of accepted concurrent request processing (goroutine)
+    MaxActiveRequest=1000
+
+    #  Number of Threads per node (or physical host) to instanciate
+    #  to process database requests coming from the Message Queue.
+    #
+    NbRequestWorkerPerNode = 4
+
+    # NA2
+    Cass_Hosts = "172.31.10.4:9042;172.31.27.92:9042;172.31.39.151:9042"
+
+    Cass_Keyspace = "kaicloud_preprod"
+    AppMetrics_Keyspace = "appmetrics"
+    AppMetric_AutoRotation = "Daily"
+
+    Default_Role_Id = [ "JeRhOE86OMbyqmrzGL6U" ]
+
+[Storage]
+
+    # URL where the artifacts should be made "publicly" available.
+    # NOTE: This is to keep backward compatibility but normally it should be
+    # specified for each Storage component as for some storage (that are private)
+    # we don't want to specify an official and public domain name.
+    PublicURL = "https://storage.kaiostech.com"
+
+    [Storage.KaiStoreEvent]     
+        Args="k5-na2-store_events_stream"
+        Region="us-east-1"
+        Access_Key_Name="kinesis_access_key"
+        Secret_Key_Name="kinesis_secret_key"  
+        API="https://kinesis.us-east-1.amazonaws.com"
+        Version="v4"
+
+    [Storage.KaiEventLogger]     
+        Args="k5-na2-eventlogger_events_stream"   
+        Region="us-east-1"
+        Access_Key_Name="kinesis_access_key"
+        Secret_Key_Name="kinesis_secret_key"  
+        API="https://kinesis.us-east-1.amazonaws.com"
+        Version="v4"
+
+    [Storage.NATS_Storage]
+        # Specify which storage solution to use from the ones
+        # provided below
+        Component="swfs"
+
+        # S3 Storage configuration specification for NATS.
+        # Must be provided since 's3' has been selected above as Component name.
+        [Storage.NATS_Storage.S3]
+            # Specify the full node list of the local regional cluster nodes
+            # to allow high availability. Note that the S3 bucket name is
+            # specified at the end of the URL (we don't support bucket name
+            # at the front of the domain because we want to use IP addresses).
+            Nodes="http://192.168.55.83:18088/internal,http://192.168.61.204:18088/internal,http://192.168.66.236:18088/internal,http://192.168.78.73:18088/internal"
+
+            # Let S3 server knows which region it is serving.
+            # Required for proper request signature. Whatever region is set
+            # into the Minio nodes should match here.
+            Region="k5-na2"
+            Access_Key_Name="aws_s3_access_key"
+            Secret_Key_Name="aws_s3_secret_key"
+
+            # With Minio, v2 is the prefered solution. v4 hasn't been tested ... .
+            Version="v2"
+
+        [Storage.NATS_Storage.SWFS]
+            Nodes="http://172.31.3.161:9333"
+	        Region = "k5-na2"
+
+    [Storage.Public_Storage]
+        # Specify which storage solution to use from the ones
+        # provided below
+        Component="swfs"
+
+        # S3 Storage configuration specification for Publicly available storage.
+        [Storage.Public_Storage.S3]
+            Nodes="http://192.168.55.83:18088/public,http://192.168.61.204:18088/public,http://192.168.66.236:18088/public,http://192.168.78.73:18088/public"
+            Region="k5-na2"
+            Version="v2"
+            Access_Key_Name="aws_s3_access_key"
+            Secret_Key_Name="aws_s3_secret_key"
+
+        [Storage.Public_Storage.SWFS]
+            Nodes="http://172.31.7.229:9333"
+	        Region = "k5-na2"
+
+    [Storage.Protected_Storage]
+        # Specify which storage solution to use from the ones
+        #   provided below
+        Component="swfs"
+
+        # S3 Storage configuration specification for Protected storage (like paid apps).
+        [Storage.Protected_Storage.S3]
+            Nodes="http://192.168.55.83:18088/private,http://192.168.61.204:18088/private,http://192.168.66.236:18088/private,http://192.168.78.73:18088/private"
+            Region="k5-na2"
+            Version="v2"
+            Access_Key_Name="aws_s3_access_key"
+            Secret_Key_Name="aws_s3_secret_key"
+
+        [Storage.Protected_Storage.SWFS]
+            Nodes="http://172.31.3.161:9333"
+	        Region = "k5-na2"
+
+[HashImei]
+    Loops= 1000
+
+[JWT]
+	PublicKeyFile = "conf/jwt_key.pub"
+	PrivateKeyFile = "conf/jwt_key.priv"
+	DefaultTokenDuration = 3600
+	IssuerName="auth.kaiostech.com"
+
+[QueueService]
+    # Max amount of time (milliseconds) the NATS client is going 
+	# to wait for a sent msg to be acknowledge internally by 
+    # NATS server before reporting an error.
+    # Default: 1000 ms
+	FlushTimeOut = 1000  # ms
+
+    # Max amount of time (milliseconds) a NATS client in Logical Layer
+    # is going to wait for a response to come back after a request has 
+    # been sent before reporting an error.
+    # Default: 3000 ms
+	LLRspTimeOut = 10000  # ms
+	
+    # Max amount of time (milliseconds) the NATS client in Front End 
+    # is going to wait for a response to come back after a request has 
+    # been sent before reporting an error.
+    # Default: 10000 ms
+	FERspTimeOut = 10000 # ms
+
+    # Max amount of time (milliseconds) the FE Handler needs to wait
+    # for a Bind Response for KidWatch Binding.
+    # Default: 90000 ms
+    BindWatchTimeOut=90000  #ms
+
+	# Max message size (in byte) the NATS Client is accepting to 
+    # transport and deliver natively (without using temporary shared 
+    # file system storage).
+	MaxMsgSize = 1000000  # bytes
+
+    # Amount of NATS client the ClientManager should instanciate in
+    # advance into its internal pool.
+    CliPoolSize = 1000
+
+    # Retry Number of message sending before giving up.
+    #
+    # Default is 2
+    #
+    # If you set 2, then in the worst case, the message is sent 1 + 2 = 3
+    # times before reporting an error. The total amount of time before 
+    # reporting the error would be 3 * FlushTimeOut.
+	RetryNb = 2
+
+    # Name of the channel subject to use between Front End and
+    # Logic Layer.
+	FE2LL_Subject = "fe2ll_kc_fin_fe"
+
+    # Name of the channel subject to use between Front End and
+    # Logic Layer for purposes of authorization which requires enough
+    # system performance to process cryptology for most auth requests.
+    FE2LL_Heavy_Subject = "fe2ll_kc_fin_fe_heavy3"
+
+    # Name of the channel subject to use between Front End and
+    # Data Layer.
+	FE2DL_Subject = "fe2dl_kc_fin_fe"
+
+    # Name of the channel subject to use between Logic Layer and
+    # Data Layer.
+	LL2DL_Subject = "ll2dl_kc_fin_fe"
+
+    # Name of the channel subject to use between different modules
+	# of the Logic Layer.
+	LL2LL_Subject = "ll2ll_kc_fin_fe"
+
+    # Name of the Sign App channel subject
+	# of the Logic Layer.
+	LL2SA_Subject = "ll2sa3"
+
+	Nodes = "172.31.4.94:4222,172.31.23.163:4222,172.31.45.162:4222"
+
+    [QueueService.QueueServiceDataLayer]
+
+        # DL Connection Attempt Timeout
+        DL_Connection_Attempt_Timeout_Secs = 5
+
+        # DL JNats Buffer Size
+        # Sets the initial size for buffers in the connection, primarily for testing.
+        DL_Buffer_Size = 2000000
+
+        # DL Ping Interval of Jnats in Seconds
+        #
+        # Set the interval between attempts to pings the server. These pings are automated,
+        # and capped by {@link #maxPingsOut(int) maxPingsOut()}.
+        DL_Ping_Interval_Secs = 5
+
+        # DL Reconnect Wait of JNats
+        # Set the time to wait between reconnect attempts to the same server. This setting is only used
+        # by the client when the same server appears twice in the reconnect attempts, either because it is the
+        # only known server or by random chance. Note, the randomization of the server list doesn't occur per
+        # attempt, it is performed once at the start, so if there are 2 servers in the list you will never encounter
+        # the reconnect wait.
+        DL_Reconnect_Wait_Millis = 250
+
+        # Set the interval between cleaning passes on outstanding request futures that are cancelled or timeout
+        # in the application code.
+        #
+        # The default value is probably reasonable, but this interval is useful in a very noisy network
+        # situation where lots of requests are used.
+        DL_Request_Cleanup_Interval_Secs = 2
+
+[RedisService]
+
+	#
+    #  The maximum number of retries before giving up. Command is retried
+    #  on network errors and MOVED/ASK redirects.
+    #  Default is 16.
+    #
+	MaxRedirects = 16
+	Table_Prefix = "kai_"
+
+    Nodes = "172.31.3.159:7000,172.31.23.243:7000,172.31.53.190:7000,172.31.24.58:7000,172.31.61.143:7000,172.31.0.203:7000"
+
+[LBS]
+
+    GEOLOCATE_URL   = "https://cps.combain.com?key="
+    GEOSUBMIT_URL   = "https://kaiossubmit.combain.com?key="
+    GEOREGION_URL   = "http://0.0.0.0"
+    JSON            = "application/json"
+    LOCATE_API_KEY  = "geolocate_api_key"
+    SUBMIT_API_KEY  = "geosubmit_api_key"
+
+
+
+[SMS]
+    # Component name to use.
+    # Either 'aws_sns' or 'smpp'.
+	Component = "aws_sns"
+
+    [SMS.SMPP]
+        # Host name or IP address of the SMPP server
+        Host = "10.55.79.162"
+
+        # Port to use to connect to provided host.
+        Port = 5001
+
+    [SMS.AWS_SNS]
+        # Ireland
+	    #AWS_SNS_API="sns.eu-west-1.amazonaws.com"
+
+        # N. Virginia
+        AWS_SNS_API="sns.us-east-1.amazonaws.com"
+
+
+[Email]
+    # Component name to use.
+    # Either 'aws_ses' or 'smtp'.
+	Component = "smtp"
+
+    [Email.SMTP]
+        # # Host name or IP address of the SMTP server
+        Host = "smtp-mail.outlook.com"
+        # # Port to use to connect to provided host.
+        Port = 587
+        Login_Key_Name="smtp_login"
+        Password_Key_Name="smtp_pw"
+
+    [Email.AWS_SES]
+        # Ireland
+	    #AWS_SES_API="email.eu-west-1.amazonaws.com"
+
+        # N. Virginia
+        AWS_SES_API="email.us-east-1.amazonaws.com"
+
+[PSMS]
+    # API Base URL of Origin Data PSMS.
+    API_Url = "http://unlock-api-external-dev.eu-west-1.elasticbeanstalk.com/api/ext"
+    # Origin Data assigned Client ID for Kaiostech
+    Client_Id = "1"
+    # This field contaiins the key name used in the Key Holder Object
+	# containing the Origin Data assigned secret key for API authorization
+    Secret_Key_Name = "psms_secret_key"
