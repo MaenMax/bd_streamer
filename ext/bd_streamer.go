@@ -59,7 +59,7 @@ func Stream(origin_request *mq.MQRequest, event T_Event, event_id string) (cerr 
 	if err != nil {
 		cerr = cerrors.New(cerrors.ERROR_INTERNAL_SERVER_ERROR, fmt.Sprintf("Failed to set request data: '%s'", err.Error()), "bd_streamer.Stream", true)
 	}
-	request := mq.NewMQRequest(event_id, mq.MQRT_CREATE, mq.MQSCOPE_FIN_BD_STREAM, origin_request.ReqId, nil)
+	request := mq.NewMQRequest(event_id, mq.MQRT_CREATE, mq.MQSCOPE_FIN_BD_STREAM, origin_request.ReqId, origin_request.ReqInfo)
 	if err = request.SetData(event_bytes); err != nil {
 		cerr = cerrors.New(cerrors.ERROR_INTERNAL_SERVER_ERROR, fmt.Sprintf("Failed to set request data: '%s'", err.Error()), "bd_streamer.Stream", true)
 		return cerr
