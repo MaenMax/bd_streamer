@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration shutdownHook="disable">
+  <Appenders>
+
+    <!--
+    <File name="DL3_TOP_LOGFILE" fileName="bd_streamer_dl3.log" bufferedIO="true" bufferSize="65536">
+      <PatternLayout pattern="%d [%t] %-5level %l - %msg%n"/>
+    </File>
+    -->
+
+    <RollingFile name="DL3_TOP_LOGFILE" fileName="bd_streamer_dl3.log" filePattern="bd_streamer_dl3.log.%i" ignoreExceptions="false">
+      <PatternLayout>
+		<Pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %l - %msg%n</Pattern>
+		<!--
+		<Pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %p %m%n</Pattern>
+		-->
+      </PatternLayout>
+      <Policies>
+        <OnStartupTriggeringPolicy />
+        <SizeBasedTriggeringPolicy size="10 MB"/>
+      </Policies>
+      <DefaultRolloverStrategy max="1000"/>
+    </RollingFile>
+
+
+    <Console name="CONSOLE">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %l - %msg%n"/>
+    </Console>
+    
+  </Appenders>
+  
+  <Loggers>
+
+    <logger name="org.apache.zookeeper" level="warn">
+      <AppenderRef ref="DL3_TOP_LOGFILE"/>
+    </logger>
+
+    <logger name="org.apache.hadoop.hbase.zookeeper" level="warn">
+      <AppenderRef ref="DL3_TOP_LOGFILE"/>
+    </logger>
+
+    <logger name="org.apache.hadoop" level="warn">
+      <AppenderRef ref="DL3_TOP_LOGFILE"/>
+    </logger>
+
+
+    <Root level="debug" additivity="false">
+      <AppenderRef ref="DL3_TOP_LOGFILE"/>
+    </Root>
+    
+  </Loggers>
+  
+</Configuration>
