@@ -388,28 +388,28 @@
 
     # Name of the channel subject to use between Front End and
     # Logic Layer.
-	FE2LL_Subject = "fe2ll_kc_fin_fe"
+	FE2LL_Subject = ""
 
     # Name of the channel subject to use between Front End and
     # Logic Layer for purposes of authorization which requires enough
     # system performance to process cryptology for most auth requests.
-    FE2LL_Heavy_Subject = "fe2ll_kc_fin_fe_heavy3"
+    FE2LL_Heavy_Subject = ""
 
     # Name of the channel subject to use between Front End and
     # Data Layer.
-	FE2DL_Subject = "fe2dl_kc_fin_fe"
+	FE2DL_Subject = ""
 
     # Name of the channel subject to use between Logic Layer and
     # Data Layer.
-	LL2DL_Subject = "ll2dl_kc_fin_fe"
+	LL2DL_Subject = "ext_to_bd_stream"
 
     # Name of the channel subject to use between different modules
 	# of the Logic Layer.
-	LL2LL_Subject = "ll2ll_kc_fin_fe"
+	LL2LL_Subject = ""
 
     # Name of the Sign App channel subject
 	# of the Logic Layer.
-	LL2SA_Subject = "ll2sa3"
+	LL2SA_Subject = ""
 
 	Nodes = "172.31.4.94:4222,172.31.23.163:4222,172.31.45.162:4222"
 

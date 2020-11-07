@@ -1,0 +1,484 @@
+[Common]
+    Version="v3.0"
+    ResourceServerName="api.stage.kaiostech.com"
+    ServicesServerName="services.stage.kaiostech.com"
+    ServiceName=["antitheft","devlogin"]
+    AuthServerName="auth.stage.kaiostech.com"
+    DeveloperServiceName="developer.stage.kaiostech.com"
+    Debug=true
+    Test=false
+    PaymentsEnabled=false
+
+    [Common.Log]
+        DisplayDeviceId=true 
+	DisplayDeviceCU=true 
+	DisplayDeviceUA=true
+
+[MobileService]
+   Service_Name = "antitheft"
+   Reset_Password_Uri = "#/resetPassword"
+   Reset_Password_Error_Uri = "#/failedPasswordReset"
+   Activation_Success_Uri =   "#/successfulActivation"
+   Activation_Error_Uri =    "#/failedActivation"
+
+[DeviceFinancier]
+	ServiceIdFinancier =  "e2NiOgogbh6b25X3p2TQ"
+
+[FrontLayer]
+	MaxActiveRequest=1000
+	Heavy_Load_Channel = false
+
+	DefaultEP = [ "api.stage.kaiostech.com" ]
+	LBSEP = [ "api.stage.kaiostech.com", "lbs.stage.kaiostech.com" ]
+	StorageEP = [ "api.stage.kaiostech.com", "storage.stage.kaiostech.com", "services.stage.kaiostech.com" ]
+	PushEP = [ "api.stage.kaiostech.com", "push.stage.kaiostech.com", "push.kaiostech.com" ]
+	HttpPort = 8091
+	HttpsPort = 0
+	PortalHttpPort = 0
+	TinyStoreOrigins = ["kaiostech.com"]
+
+    [FrontLayer.ServiceCenter]
+       PlusInfoVersion = "2.4.6"
+       CorePartner = "ddsMreKpOJixSvYF5cvz"
+
+
+    [FrontLayer.CredChecker]
+       DisableKaiStoreCheck=false      
+       DisableEventLoggerCheck=false
+
+    [FrontLayer.ServiceCenter.BaseURLs]
+            DeviceArtifactBaseUrl = "https://storage.stage.kaiostech.com/v3.0/files/app"
+            DeviceZipBaseUrl = "https://storage.stage.kaiostech.com/v3.0/files/zip"
+            PaidAppDownloadBaseURL = "https://storage.stage.kaiostech.com/v3.0/files/purchases/apps/{app_id}"
+            ManifestBaseUrl = "https://api.stage.kaiostech.com/"
+
+    [FrontLayer.ServiceCenter.Cache]
+        Apps_TTL = 650
+        Manifests_TTL = 650
+
+        Request_Buffer_Size = 1000
+        Retry_On_Error_Time = 10000
+        Refresh_Period = 200000
+        Scheduler = "absolute"
+        Filtering_HNI = "sim"
+
+[LogicLayer]
+	MaxActiveRequest=200
+	Process_Only_Heavy_Requests = false
+	KaiOSPushUrl = "https://notification.stage.kaiostech.com:8443"
+	User_Trail_Log = "user_trail.log"
+	Max_Head_Stack_MB = 4000
+	EmailVerificationExpiry = 1440
+        AppIdDeactivateAntitheft = "kNpFU6NavpPh4e5qnlFz" 
+        LockCampaignTTL = 60
+    
+    [LogicLayer.Payment]
+#       PurchaseIntentTTL = 600
+        AuthTokenTTL = 600
+        AuthSMSTokenTTL = 86400
+        AuthWithPassword = false
+
+        VerifyURL = "https://api.stage.kaiostech.com/v3.0/purchases/{transaction}/verify"
+
+	[LogicLayer.Payment.ProductDefaultIcons]
+                56="https://static.kaiostech.com/merch_default_56.png"
+                112="https://static.kaiostech.com/merch_default_112.png"
+
+
+     [LogicLayer.W3C]
+        # W3C Push message TTL
+	Msg_TTL = "2592000s"
+
+     [LogicLayer.W3C.Vapid]
+    
+	Vapid_PrivKey = "/data/var/conf/antitheft_vapid_private.pem"
+        Vapid_PubKey  = "/data/var/conf/antitheft_vapid_public.pem"
+	Vapid_Audience = "push.stage.kaiostech.com"
+	Vapid_TTL = "3600s"
+	Vapid_Subject = "https://services.stage.kaiostech.com/antitheft"
+        AppIdDeactivateAntitheft = "1wnHrl36uvwt4d8OOwxl"      
+
+      [LogicLayer.ServiceCenter]
+        # The following URLs are used when sending the  approval or rejected
+        # emails when an App is Approved (or Rejected)
+        EmailSubportalURL = "https://developer.stage.kaiostech.com/devlogin/"
+        EmailTermsOfServiceURL = "https://www.kaiostech.com/terms-of-services/"
+        EmailCustomerSupportURL = "https://support.kaiostech.com/support/tickets/new" 
+
+	[LogicLayer.DeviceFinancier]
+                FinancierPrivateKey = "nonce_encryption_key"
+
+[CampaignProcessor]
+         # Maximum number of accepted concurrent request processing (goroutine)
+         MaxActiveRequest= 200                     ### Enter value from LogicLayer
+         ActiveJobDeliveryWorkers = 1
+         PcDeliveryCacheTTL = "300s"  # 
+         NoActiveJobSleep = 10000      # milliseconds. 10 seconds
+         NoSchedulePCSleep = 60        # seconds
+         NoDeletePCSleep = 60          # seconds
+         ScheduleCheckInterval = 5     # seconds/
+         [CampaignProcessor.W3C]
+             # W3C Push message TTL
+             Msg_TTL = "2592000s"
+             [CampaignProcessor.W3C.Vapid]
+                ### Enter all the values from [LogicLayer.W3C.Vapid]
+                Vapid_PrivKey = "conf/pc_vapid_private.pem"
+                Vapid_PubKey  = "conf/pc_vapid_public.pem"
+                # Audience to be put into the Vapid JWT token.
+                Vapid_Audience = "push.stage.kaiostech.com"
+                # Duration of the Vapid JWT token.
+                Vapid_TTL = "3600s"
+                # Subject (usually email address or URL of the application server) to be put into the Vapid JWT token.
+                Vapid_Subject = "https://services.stage.kaiostech.com/push_campaign"
+        [CampaignProcessor.HealthCheck]
+                ### Enter all the values from [LogicLayer.HealthCheck]
+                HealthCheckEnable = true
+                HealthCheckPort   = 5002
+                HealthCheckRate = 2
+                HealthCheckBurst = 5
+
+[PushApp]
+         ServiceIdPushApp = "Q4p0uTHZeP_d_QBRET3p"
+         ListChunkSize = 1000
+         LockAppPushTTL = 30 #sec
+
+	[PushApp.W3C]
+             # W3C Push message TTL
+             Msg_TTL = "2592000s"
+             [PushApp.W3C.Vapid]
+                ### Enter all the values from [LogicLayer.W3C.Vapid]
+                Vapid_PrivKey = "conf/app_push_vapid_private.pem"
+                Vapid_PubKey  = "conf/app_push_vapid_public.pem"
+                # Audience to be put into the Vapid JWT token.
+                Vapid_Audience = "push.stage.kaiostech.com"
+                # Duration of the Vapid JWT token.
+                Vapid_TTL = "3600s"
+                # Subject (usually email address or URL of the application server) to be put into the Vapid JWT token.
+                Vapid_Subject = "https://services.stage.kaiostech.com/app_push"
+
+[DataLayer]
+    MaxActiveRequest=1000
+    NbRequestWorkerPerNode = 4
+    Cass_Hosts = "172.31.1.243:9042;172.31.24.152:9042;172.31.78.130:9042"
+    Cass_Keyspace = "kaicloud"
+    Default_Role_Id = [ "JeRhOE86OMbyqmrzGL6U" ]
+
+[Storage]
+    # URL where the artifacts should be made "publicly" available. 
+    # NOTE: This is to keep backward compatibility but normally it should be 
+    # specified for each Storage component as for some storage (that are private)
+    # we don't want to specify an official and public domain name.
+    PublicURL = "https://storage.stage.kaiostech.com"
+    Max_Event_Buffer_Size = 1024       
+    Event_Buffer_Retry_Wait_Secs = 10000 
+
+    [Storage.KaiStoreEvent]     
+        Args="k3-na2-store_events_stage_stream"
+        Region="us-east-1"
+        Access_Key_Name="kinesis_access_key"
+        Secret_Key_Name="kinesis_secret_key"  
+        API="https://kinesis.us-east-1.amazonaws.com"
+        Version="v4"
+
+    [Storage.KaiPay_Event]
+       Args="kaios-datatech-stage-kaipay-events-stream"
+       Region="us-east-1"
+       Access_Key_Name="kinesis_access_key"
+       Secret_Key_Name="kinesis_secret_key"
+       API="https://kinesis.us-east-1.amazonaws.com"
+       Version="v4"
+
+    [Storage.Wallpaper_Event]
+       Args="kaios-datatech-stage-wallpaper-app-events-stream"
+       Region="us-east-1"
+       Access_Key_Name="kinesis_access_key"
+       Secret_Key_Name="kinesis_secret_key"
+       API="https://kinesis.us-east-1.amazonaws.com"
+       Version="v4"
+
+
+    [Storage.KaiEventLogger]     
+        Args="k3-na2-eventlogger_events_stage_stream"   
+        Region="us-east-1"
+        Access_Key_Name="kinesis_access_key"
+        Secret_Key_Name="kinesis_secret_key"  
+        API="https://kinesis.us-east-1.amazonaws.com"
+        Version="v4"
+
+    [Storage.NATS_Storage]
+        # Specify which storage solution to use from the ones
+        # provided below
+        Component="s3"
+
+        # S3 Storage configuration specification for NATS.
+        # Must be provided since 's3' has been selected above as Component name.
+        [Storage.NATS_Storage.S3]
+            # Specify the full node list of the local regional cluster nodes 
+            # to allow high availability. Note that the S3 bucket name is 
+            # specified at the end of the URL (we don't support bucket name
+            # at the front of the domain because we want to use IP addresses).
+            API="http://10.81.74.150:18088/internal,http://10.81.74.151:18088/internal,http://10.81.74.152:18088/internal,http://10.81.74.153:18088/internal"
+
+            # Let S3 server knows which region it is serving.
+            # Required for proper request signature. Whatever region is set 
+            # into the Minio nodes should match here.
+            Region="us-east-1"
+            Access_Key_Name="aws_s3_access_key"
+            Secret_Key_Name="aws_s3_secret_key"
+
+            # With Minio, v2 is the prefered solution. v4 hasn't been stageed ... . 
+            Version="v2"
+
+        [Storage.NATS_Storage.SWFS]
+            Nodes="http://192.168.52.26:9333"
+	        Region = "us-east-1"
+
+    [Storage.Public_Storage]
+        # Specify which storage solution to use from the ones
+        # provided below
+        Component="s3"
+
+        # S3 Storage configuration specification for Publicly available storage.
+        [Storage.Public_Storage.S3]
+            API="http://10.81.74.150:18088/public,http://10.81.74.151:18088/public,http://10.81.74.152:18088/public,http://10.81.74.153:18088/public"
+            Region="us-east-1"
+            Version="v2"
+            Access_Key_Name="aws_s3_access_key"
+            Secret_Key_Name="aws_s3_secret_key"
+
+        [Storage.Public_Storage.SWFS]
+            Nodes="http://192.168.52.26:9333"
+	        Region = "us-east-1"
+
+    [Storage.Protected_Storage]
+        # Specify which storage solution to use from the ones
+        #   provided below
+        Component="s3"
+
+        # S3 Storage configuration specification for Protected storage (like paid apps).
+        [Storage.Protected_Storage.S3]
+            API="http://10.81.74.150:18088/private,http://10.81.74.151:18088/private,http://10.81.74.152:18088/private,http://10.81.74.153:18088/private"
+            Region="us-east-1"
+            Version="v2"
+            Access_Key_Name="aws_s3_access_key"
+            Secret_Key_Name="aws_s3_secret_key"
+
+        [Storage.Protected_Storage.SWFS]
+            Nodes="http://192.168.52.26:9333"
+	        Region = "us-east-1"
+
+	[Storage.Trash_Storage]
+        Component="s3"
+
+        [Storage.Trash_Storage.S3]
+            API="http://10.81.74.150:18088/trash,http://10.81.74.151:18088/trash,http://10.81.74.152:18088/trash,http://10.81.74.153:18088/trash"
+            Version="v2"
+            Region="na-virginia"
+            Access_Key_Name="aws_s3_access_key"
+            Secret_Key_Name="aws_s3_secret_key"
+
+
+[HashImei]
+    Loops= 1000
+
+[JWT]
+	PublicKeyFile = "conf/jwt_key.pub"
+	PrivateKeyFile = "conf/jwt_key.priv"
+	DefaultTokenDuration = 3600
+	IssuerName="auth.stage.kaiostech.com"
+
+[QueueService]
+    	# Max amount of time (milliseconds) a NATS client in Campaign processor
+    	# is going to wait for a response to come back after a request has
+    	# been sent before reporting an error.
+    	# Default: 3000 ms
+        CPRspTimeOut = 5000  # ms                   ### Enter value from Logic Layer 'LLRspTimeOut'
+    	# Name of the channel subject to use between Front End and
+    	# Campaign Processor.
+
+        FE2CP_Subject = "fe2cp_v3"
+	FlushTimeOut = 500  # ms
+	LLRspTimeOut = 5000  # ms
+	FERspTimeOut = 10000 # ms
+	MaxMsgSize = 1000000  # bytes
+        CliPoolSize = 1000
+	RetryNb = 2
+
+	FE2LL_Subject = ""
+        FE2LL_Heavy_Subject = ""
+	FE2DL_Subject = ""
+	LL2DL_Subject = "ext_to_bd_stream"
+	LL2LL_Subject = ""
+	LL2SA_Subject = "ll2sa"
+
+        # us-east-1
+        Nodes = "172.31.1.152:4222,172.31.2.93:4222,172.31.2.209:4222"
+
+    [QueueService.QueueServiceDataLayer]
+
+        # DL Connection Attempt Timeout
+        DL_Connection_Attempt_Timeout_Secs = 5
+
+        # DL JNats Buffer Size
+        # Sets the initial size for buffers in the connection, primarily for stageing.
+        DL_Buffer_Size = 2000000
+
+        # DL Ping Interval of Jnats in Seconds
+        #
+        # Set the interval between attempts to pings the server. These pings are automated,
+        # and capped by {@link #maxPingsOut(int) maxPingsOut()}.
+        DL_Ping_Interval_Secs = 5
+
+        # DL Reconnect Wait of JNats
+        # Set the time to wait between reconnect attempts to the same server. This setting is only used
+        # by the client when the same server appears twice in the reconnect attempts, either because it is the
+        # only known server or by random chance. Note, the randomization of the server list doesn't occur per
+        # attempt, it is performed once at the start, so if there are 2 servers in the list you will never encounter
+        # the reconnect wait.
+        DL_Reconnect_Wait_Millis = 250
+
+        # Set the interval between cleaning passes on outstanding request futures that are cancelled or timeout
+        # in the application code.
+        #
+        # The default value is probably reasonable, but this interval is useful in a very noisy network
+        # situation where lots of requests are used.
+        DL_Request_Cleanup_Interval_Secs = 2
+
+[RedisService]
+	MaxRedirects = 16
+	Table_Prefix = "kai_"
+        Nodes = "k3-na2-rema-a-001:7000,k3-na2-rema-a-002:7000,k3-na2-rema-a-003:7000,k3-na2-resl-c-001:7000,k3-na2-resl-c-002:7000,k3-na2-resl-c-003:7000"
+
+
+[LBS]
+        GEOLOCATE_URL   = "https://cps.combain.com?key="
+        GEOSUBMIT_URL   = "https://kaiossubmit.combain.com?key="
+        GEOREGION_URL   = "http://0.0.0.0"
+        JSON            = "application/json"
+        LOCATE_API_KEY         = "geolocate_api_key"
+        SUBMIT_API_KEY         = "geosubmit_api_key"
+
+
+[SMS]
+    # Component name to use.
+    # Either 'none', 'aws_sns' or 'smpp'.
+	Component = "aws_sns"
+
+    [SMS.SMPP]
+        # # Host name or IP address of the SMPP server
+        # Host = "10.55.79.162"
+        # # Port to use to connect to provided host.
+        # Port = 5001
+        # Login_Key_Name="smpp_login"
+        # Password_Key_Name="smpp_password"
+
+    [SMS.AWS_SNS]
+        # N. Virginia
+        API="sns.us-east-1.amazonaws.com"
+        Access_Key_Name="aws_sns_access_key"
+        Secret_Key_Name="aws_sns_secret_key"
+        Version="v4"
+
+
+[Email]
+    # Component name to use.
+    # Either 'none', 'aws_ses' or 'smtp'.
+	Component = "smtp"
+    SenderMbox = "registration@kaiostech.com"
+
+    [Email.SMTP]
+        Host = "smtp-mail.outlook.com"
+        Port = 587
+        Login_Key_Name="smtp_login"
+        Password_Key_Name="smtp_pw"
+
+    [Email.AWS_SES]
+        # Ireland
+	    # API="email.eu-west-1.amazonaws.com"
+
+        # N. Virginia
+        API="email.us-east-1.amazonaws.com"
+        Access_Key_Name="aws_ses_access_key"
+        Secret_Key_Name="aws_ses_secret_key"
+        Version="v4"
+        # Duration which must elapse before next email can be sent for Very First Time
+        EmailSentVFTTimeout = "15m"
+        # Duration which must elapse before next email can be sent for Unavailable First Time
+        EmailUnavailableVFTTimeout = "12h"
+        # Duration which must elapse before next email can be sent for Very First Time Temporarily Unavailable
+        EmailSentVFTTUTimeout = "15m"
+        # Duration which must elapse before next email can be sent for Invalid after Healthy
+        EmailInvalidHealthyTimeout = "168h"
+        # Duration which must elapse before next email can be sent for Unavailable after Healthy
+        EmailUnavailableHealthyTimeout = "12h"
+        # Duration which must elapse before next email can be sent for Sent Healthy
+        EmailSentHealthyTimeout = "1m"
+        # Duration which must elapse before next email can be sent for Healthy Status
+        EmailHealthyTimeout = "1m"
+        Limiter = "redis"
+
+[Payment]
+
+    [Payment.Providers.PaymentWall]
+        Credit_Card_API_Key_Name = "pw_cc_api_key"
+        DCB_API_Secret_Key_Name = "pw_dcb_secret_key"
+        DCB_API_Public_Key_Name = "pw_dcb_public_key"
+
+        # Only accept pingback requests from whitelisted IPs
+        # Specifed in PW doc: https://docs.paymentwall.com/reference/pingback-home
+        Pingback_Whitelisted_IPs = "174.36.92.186,174.36.96.66,174.36.92.187,174.36.92.192,174.37.14.28"
+
+    [Payment.Providers.OD]
+        # API Base URL of Origin Data PSMS.
+        API_Url = "http://kaios-unlockapi-prod.eu-west-1.elasticbeanstalk.com/api/ext"
+        # Origin Data assigned Client ID for Kaiostech
+        Client_Id = "98"
+        # This field contaiins the key name used in the Key Holder Object
+        # containing the Origin Data assigned secret key for API authorization
+        Secret_Key_Name = "psms_secret_key"
+ 
+    [Payment.Cache]
+        # Refresh period of in-memory applist.
+        # Time in Seconds (1 day)
+        Refresh_Period = 86400
+        Request_Buffer_Size = 1000
+        # Time in Milliseconds
+        Retry_On_Error_Time = 10000
+        Scheduler = "absolute"
+
+[Account]
+       NewAccountEmailActivationTTL = "24h"
+       NewAccountPhoneActivationTTL = "5m"
+
+[Security]
+     # Maximum number of invalid login attempts before account is locked
+     MaxInvalidTries=100
+
+     # Duration account is locked after reaching maximum number of invalid login attempts
+     AccountLockTimeout="15m"
+
+     #Duration in which another email can be sent for registration/account
+     ResendEmailTimeout="2m"
+
+     # Duration in which another SMS can be sent
+     SMSResendTimeout="1m"	
+
+[DevService]
+     Service_Name = "devlogin"
+     Reset_Password_Uri = "resetpassword"
+     Reset_Password_Error_Uri = "failed_password_reset"
+     Activation_Success_Uri = "successful_activation"
+     Activation_Error_Uri = "activation_fail"
+ 
+[PasswordReset]
+    # Audience is used for the token generation used to reset the password.
+    Audience="api.stage.kaiostech.com"
+
+    # Url is the link where to redirect for completing a password reset operation.
+    # It has to point to the Password Reset page of a system. KSO is the candidate
+    # for such move.
+    Url="https://developer.stage.kaiostech.com/kso/v1.0/sreset"
+
+# Adding a connection with KSO to password reset, and account activation success/failure.
+[Kso]
+    BaseUrl="https://developer.stage.kaiostech.com/kso/v1.0"

@@ -109,6 +109,7 @@ public class AutomataRequestProcessor extends Thread {
         // a Map<String,Object>. Thus is leads to some clashes when decoding/encoding
         // in JSON.
         //jwt=_codec.decode(request.JWT.getBytes(),JWT.class);
+
         if (request.JWT != null) {
             jwt = JWT.fromString(request.JWT);
         }

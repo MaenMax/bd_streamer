@@ -1,3 +1,6 @@
+2020/11/07 15:12 Maen v1.0.2
+  * Bug 109122 - fixing mq response issue. r=Raffi
+
 2020/11/05 01:29 Maen v1.0.1
   * Bug 108976 - adding original request info. r=Raffi
 

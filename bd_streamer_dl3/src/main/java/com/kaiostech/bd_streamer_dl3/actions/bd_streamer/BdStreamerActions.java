@@ -56,7 +56,6 @@ class CreateEventRecord implements IAction{
     data = null;
     boolean ok;
     String eventId = request.ObjectId;
-
     MQDataResult dr = request.Data();
     if (dr.err != null){
         _logger.error("Req #" + request.ReqId + ": CreateEventRecord aborted due to error while fetching request body data: '"+dr.err.toString()+"'!");
@@ -64,7 +63,7 @@ class CreateEventRecord implements IAction{
         return new MQResponse(request.Id, "", request.Type, request.Scope, data, true, request.ReqId);
     }
     try{
-    ok = _db.createEventRecord(eventId, data);
+    ok = _db.createEventRecord(eventId, dr.data);
     } catch(CException e){
         _logger.error("Req #"+request.ReqId+": "+"ReqProc #"+id+": Received request "+request.Id+": " + e.getMessage());
         return ErrorUtils.sendErrorResponse(e.getCError(), request.Id, MQRequestType.MQRT_CREATE, MQRequestScope.MQRS_FIN_BD_STREAM, request.ReqId);
@@ -78,6 +77,6 @@ class CreateEventRecord implements IAction{
     if (_logger.isDebugEnabled()) {
         _logger.debug("Req #"+request.ReqId+": "+"CreateEventRecord ends");
     }
-	return new MQResponse(request.Id, null, request.Type, request.Scope, data, false,request.ReqId);
+	return  null;
     }
 }   
