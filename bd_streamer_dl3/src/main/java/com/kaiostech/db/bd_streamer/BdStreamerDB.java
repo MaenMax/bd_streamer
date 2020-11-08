@@ -102,47 +102,45 @@ public class BdStreamerDB{
     	Map<String,Object> query=new TreeMap<String,Object>();
         
         //Verifying functions parameters
-
         if (eventId == null) {
             _logger.error(Thread.currentThread().getId() + ": '" + "Missing or empty event ID"+ "'!");
 	    throw new CException(CError.New(CError.ERROR_INVALID_PARAMETER_VALUE, "Missing or empty event ID.", "DL:BdStreamerDB:createEventRecord"));
         }
-        
-    //Creating a timestamp
-    long ts = System.currentTimeMillis()/1000L;  //Epoch time in seconds.
+	//Creating a timestamp
+	long ts = System.currentTimeMillis();  //Epoch time in seconds.
 	
 	//Calculating cursor value based on event ID.
 	int cursor = Base64Cursor.strToInt(eventId);
 
-    // Preparing the INSERT query
+	// Preparing the INSERT query
 	query.put("cursor", cursor);
-    query.put("ts",ts);
-    query.put("event_id",eventId);
-    query.put("schema_version", SCHEMA_VERSION);
-    query.put("data",data);
+	query.put("ts",ts);
+	query.put("event_id",eventId);
+	query.put("schema_version", SCHEMA_VERSION);
+	query.put("data",data);
 
-    String table_name = getCurrentMonthTable();
+	String table_name = getCurrentMonthTable();
 
-    // Executing the INSERT query
+	// Executing the INSERT query
 	ok = _nosqldb.setValue(null,table_name,query);
 	if (_logger.isDebugEnabled()) {
 	    _logger.debug(Thread.currentThread().getId() + ": Inserting event: " + eventId + " in table: "+ table_name);
+	}
+	if (ok) {
+	    return true;
+	}
+	return false;
     }
-    if (ok) {
-    return true;
+    //Helper function to append the proper suffex to the table name for table rotation feature. Example: bd_stream_2020_11
+    public String getCurrentMonthTable() {
+	// Initializing the Date object with current EPOCH timestamp
+	Date current_date  = new Date(System.currentTimeMillis());
+	//Getting the current month in two decimal digits.
+	int currentMonth = current_date.getMonth();
+	//getting the current year (the year represented by this date, minus 1900). Thus, we need to add 1900 to get the desired value.
+	int currentYear = current_date.getYear() + 1900;
+	//Building rotating table name
+	String currentMonthTable =  FINANCIER_DATA_STREAM_TABLE_NAME + "_" + currentYear + "_" + currentMonth  ;
+	return currentMonthTable;
     }
-    return false;
-}
-//Helper function to append the proper suffex to the table name for table rotation feature. Example: bd_stream_2020_11
-public String getCurrentMonthTable() {
-    // Initializing the Date object with current EPOCH timestamp
-    Date current_date  = new Date(System.currentTimeMillis());
-    //Getting the current month in two decimal digits.
-    int currentMonth = current_date.getMonth();
-    //getting the current year (the year represented by this date, minus 1900). Thus, we need to add 1900 to get the desired value.
-    int currentYear = current_date.getYear() + 1900;
-    //Building rotating table name
-    String currentMonthTable =  FINANCIER_DATA_STREAM_TABLE_NAME + "_" + currentYear + "_" + currentMonth  ;
-    return currentMonthTable;
-}
 }
