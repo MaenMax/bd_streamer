@@ -137,10 +137,11 @@ public class BdStreamerDB{
 	Date current_date  = new Date(System.currentTimeMillis());
 	//Getting the current month in two decimal digits.
 	int currentMonth = current_date.getMonth();
+	String month_string = String.format("%02d", currentMonth+1);
 	//getting the current year (the year represented by this date, minus 1900). Thus, we need to add 1900 to get the desired value.
 	int currentYear = current_date.getYear() + 1900;
 	//Building rotating table name
-	String currentMonthTable =  FINANCIER_DATA_STREAM_TABLE_NAME + "_" + currentYear + "_" + currentMonth  ;
+	String currentMonthTable =  FINANCIER_DATA_STREAM_TABLE_NAME + "_" + currentYear + "_" + month_string  ;
 	return currentMonthTable;
     }
 }

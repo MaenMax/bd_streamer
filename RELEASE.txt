@@ -1,3 +1,6 @@
+2020/11/10 04:48 Maen v1.0.3
+  * Bug 107952 - correcting current month function. r=Raffi
+
 2020/11/07 15:12 Maen v1.0.2
   * Bug 109122 - fixing mq response issue. r=Raffi
 
