@@ -48,35 +48,30 @@ class CreateEventRecord implements IAction{
     private static IMQCodec _codec = MQCodecFactory.getDefault(); 
     
     public MQResponse execute(int id, JWT jwt, MQRequest request) {
-    if (_logger.isDebugEnabled()) {
+	if (_logger.isDebugEnabled()) {
             _logger.debug("Req #"+request.ReqId+": "+"CreateEventRecord starts");
         }
-    CError err;
-	byte[] data;
-    data = null;
-    boolean ok;
-    String eventId = request.ObjectId;
-    MQDataResult dr = request.Data();
-    if (dr.err != null){
-        _logger.error("Req #" + request.ReqId + ": CreateEventRecord aborted due to error while fetching request body data: '"+dr.err.toString()+"'!");
-        data = _codec.encode(dr.err);
-        return new MQResponse(request.Id, "", request.Type, request.Scope, data, true, request.ReqId);
-    }
-    try{
-    ok = _db.createEventRecord(eventId, dr.data);
-    } catch(CException e){
-        _logger.error("Req #"+request.ReqId+": "+"ReqProc #"+id+": Received request "+request.Id+": " + e.getMessage());
-        return ErrorUtils.sendErrorResponse(e.getCError(), request.Id, MQRequestType.MQRT_CREATE, MQRequestScope.MQRS_FIN_BD_STREAM, request.ReqId);
-    }
-    if(!ok){
-        _logger.error("Req #" + request.ReqId  + " Could not save event record in DB");
-        err = CError.New(CError.ERROR_DATABASE_FAILED,"Could not save event record in DB");
-        data=_codec.encode(err);
-        return new MQResponse(request.Id, "", MQRequestType.MQRT_CREATE, MQRequestScope.MQRS_FIN_BD_STREAM, data, true,request.ReqId); 
-    }
-    if (_logger.isDebugEnabled()) {
-        _logger.debug("Req #"+request.ReqId+": "+"CreateEventRecord ends");
-    }
+	CError err;
+	boolean ok;
+	String eventId = request.ObjectId;
+	MQDataResult dr = request.Data();
+	if (dr.err != null){
+	    _logger.error("Req #" + request.ReqId + ": CreateEventRecord aborted due to error while fetching request body data: '"+dr.err.toString()+"'!");
+	    return null;
+	}
+	try{
+	    ok = _db.createEventRecord(eventId, dr.data);
+	} catch(CException e){
+	    return ErrorUtils.sendErrorResponse(e.getCError(), request.Id, MQRequestType.MQRT_CREATE, MQRequestScope.MQRS_FIN_BD_STREAM, request.ReqId);
+	}
+	if(!ok){
+	    _logger.error("Req #" + request.ReqId  + " Could not save event record in DB");
+	    err = CError.New(CError.ERROR_DATABASE_FAILED,"Could not save event record in DB");
+	    return new MQResponse(request.Id, "", MQRequestType.MQRT_CREATE, MQRequestScope.MQRS_FIN_BD_STREAM, _codec.encode(err), true,request.ReqId); 
+	}
+	if (_logger.isDebugEnabled()) {
+	    _logger.debug("Req #"+request.ReqId+": "+"CreateEventRecord ends");
+	}
 	return  null;
     }
 }   

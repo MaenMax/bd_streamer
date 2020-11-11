@@ -42,6 +42,12 @@ func Stream(origin_request *mq.MQRequest, event T_Event, event_id string) (cerr 
 		l4g.Debug("req #%s: Stream starts", origin_request.ReqId)
 		defer l4g.Debug("req #%s: Stream ends", origin_request.ReqId)
 	}
+
+	if origin_request==nil{
+		l4g.Error("req #%v: Stream: initialization failed: '%s' ", origin_request.ReqId, "origin_request is null")
+		return cerrors.NewErrNo(cerrors.ERROR_INTERNAL_SERVER_ERROR, "origin_request is null", "bd_streamer.Stream", true, cerrors.ERRNO_OBJECT_IS_NULL)
+	}
+
 	// Race condition for the 'initialized' variable! Protect to prevent
 	// several initializations from happening in parallel.
 	mu.Lock()
@@ -49,7 +55,7 @@ func Stream(origin_request *mq.MQRequest, event T_Event, event_id string) (cerr 
 		err := auto_init(origin_request.ReqId)
 		if err != nil {
 			l4g.Error("req #%v: Stream: initialization failed: '%s' ", origin_request.ReqId, err)
-			return cerrors.NewErrNo(cerrors.ERROR_INTERNAL_SERVER_ERROR, err.Error(), "", true, cerrors.ERRNO_EXT_FAILED_TO_INIT)
+			return cerrors.NewErrNo(cerrors.ERROR_INTERNAL_SERVER_ERROR, err.Error(), "bd_streamer.Stream", true, cerrors.ERRNO_EXT_FAILED_TO_INIT)
 		}
 		initialized = true
 	}
