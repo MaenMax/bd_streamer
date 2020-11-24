@@ -1,3 +1,6 @@
+2020/11/24 14:52 sedwards v1.0.5
+  * Bug 109689 - Add bd_streamer to CI/CD r=Maen
+
 2020/11/23 17:09 Maen v1.0.4
   *Bug 110306 - correcting-financier-events.r=Raffi
 

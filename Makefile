@@ -25,7 +25,7 @@ deploy: clean ${MICROSERVICE}_dl3  ${KC_COMMON_JAR}
 
 docker: ${VERSION_DOCKER}
 	@sh -c 'tiller_json=`cat bom.json` tiller -b . –n'
-    docker build . -t ${MICROSERVICE}:${GITREF}
+	docker build . -t ${MICROSERVICE}:${GITREF}
 
 ci-container: ${VERSION_DOCKER}
 	@sh -c 'tiller_json=`cat bom.json` tiller -b . –n'

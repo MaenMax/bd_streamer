@@ -1,0 +1,18 @@
+#
+# This is a Work in Progress
+# FIXME: Move building in to docker-compose 
+
+FROM git.kaiostech.com:4567/cloud/docker-buildenv/jdk
+
+RUN mkdir -p /data/tools/repository/micro-services && \
+    mkdir -p /data/var
+
+ADD bd_streamer-<%= bd_streamer['version'] %>.tar.bz2 /data/tools/repository/micro-services
+RUN ln -s /data/tools/repository/micro-services/bd_streamer-<%= bd_streamer['version'] %> /data/tools/repository/micro-services/bd_streamer
+
+RUN mkdir -p /data/tools/repository/micro-serivces/bd_streamer/keys
+
+ENV JAVA_HOME /data/tools/repository/java
+ENV PATH="${PATH}:/data/tools/repository/java/bin:/data/tools/repository/micro-services/bd_streamer/bin"
+
+WORKDIR /data/tools/repository/micro-services/bd_streamer

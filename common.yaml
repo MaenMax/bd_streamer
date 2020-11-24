@@ -1,0 +1,14 @@
+data_sources: [ 'defaults', 'file', 'environment', 'environment_json' ]
+template_sources: [ 'file' ]
+
+defaults:
+  global:
+    default_value: 'This is a default global value that may be replaced'
+    tag: latest
+
+environments:
+  development:
+    Dockerfile.erb:
+      target: Dockerfile
+      perms: 0755
+

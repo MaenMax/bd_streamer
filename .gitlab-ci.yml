@@ -1,0 +1,95 @@
+image:
+  name: git.kaiostech.com:4567/cloud/docker-buildenv:master
+  # Override entrypoint or job return code will always be return code of
+  # /docker-entrypoint.sh.
+  # See: https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#overriding-the-entrypoint-of
+  entrypoint: [""]
+
+variables:
+  my_uid: 994
+  my_gid: 991
+
+variables:
+  GIT_STRATEGY: fetch
+  GIT_DEPTH: "1"
+  CONTAINER_DEV_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+
+before_script:
+  - echo CI_COMMIT_REF_NAME is $CI_COMMIT_REF_NAME
+  - echo CI_COMMIT_SHA is $CI_COMMIT_SHA
+  - echo CI_COMMIT_TAG is $CI_COMMIT_TAG
+  - echo CI_PROJECT_DIR is $CI_PROJECT_DIR
+  - echo CI_REGISTRY_IMAGE is $CI_REGISTRY_IMAGE
+  - echo CONTAINER_DEV_IMAGE is $CONTAINER_DEV_IMAGE
+  - echo CONTAINER_RELEASE_IMAGE is $CONTAINER_RELEASE_IMAGE
+  # - docker system prune -f
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+stages:
+  - build
+  - test
+  - release
+  - clean
+
+build:
+  tags:
+    - "empowerthings-runner"
+  stage: build
+  script:
+    - . /docker-entrypoint.sh && cd ${CI_PROJECT_DIR}
+    - git config --global url."git@git.kaiostech.com:".insteadOf "https://git.kaiostech.com/"
+    - make clean
+    - make
+  only:
+    - tags@cloud/bd_streamer
+    - branches@cloud/bd_streamer
+    - master@cloud/bd_streamer
+
+test:
+  tags:
+    - "empowerthings-runner"
+  stage: test
+  script:
+    - . /docker-entrypoint.sh && cd ${CI_PROJECT_DIR}
+    - make test
+  only:
+    - tags@cloud/bd_streamer
+    - branches@cloud/bd_streamer
+    - master@cloud/bd_streamer
+ 
+release:
+  tags:
+    - "empowerthings-runner"
+  stage: release
+  script:
+    - . /docker-entrypoint.sh && cd ${CI_PROJECT_DIR}
+    ## build tarball
+    - make deploy
+    - pwd && ls -lash *.tar.bz2
+    - mkdir -p /artifacts/bd_streamer/$CI_COMMIT_REF_NAME/$CI_COMMIT_SHA/
+    - cp *.tar.bz2 /artifacts/bd_streamer/$CI_COMMIT_REF_NAME/$CI_COMMIT_SHA/
+    - ln -sfT ../$CI_COMMIT_REF_NAME/$CI_COMMIT_SHA/ /artifacts/bd_streamer/$CI_COMMIT_REF_NAME/latest
+    ## Build base docker buildenv image
+    - make ci-container
+    - docker build --pull --no-cache -t $CONTAINER_DEV_IMAGE .
+    ## Tag and push docker-buildenv image
+    - docker tag $CONTAINER_DEV_IMAGE $CONTAINER_RELEASE_IMAGE
+    - docker push $CONTAINER_RELEASE_IMAGE
+  only:
+    - tags@cloud/bd_streamer
+    - branches@cloud/bd_streamer
+    - master@cloud/bd_streamer
+ 
+clean:
+  stage: clean
+  tags:
+    - "empowerthings-runner"
+  script:
+    - . /docker-entrypoint.sh && cd ${CI_PROJECT_DIR}
+    - docker rmi -f $CONTAINER_DEV_IMAGE
+  only:
+    - tags@cloud/bd_streamer
+    - branches@cloud/bd_streamer
+    - master@cloud/bd_streamer
+ 
