@@ -22,12 +22,12 @@ type T_Event interface {
 
 //The concrete event object. Any future changes on the event content must be updated here.
 type T_DFP_Event struct {
-	EventName    string
-	ResponseCode int
-	ResponseBody []byte
-	DeviceInfo   *financier.T_Device
+	EventName    string                `json:"event_name,omitempty"`
+	ResponseCode int                   `json:"response_code,omitempty"`
+	ResponseBody []byte                `json:"response_body,omitempty"`
+	RequestBody  []byte                `json:"request_body,omitempty"`
+	DeviceInfo   *financier.T_Device   `json:"device_info,omitempty"`
 }
-
 // The Event concrete type must implement the T_Event Interface's Marshal() method. The implementation of this method needs in consistent with the Event structure.
 func (e T_DFP_Event) Marshal() ([]byte, error) {
 	event_bytes, err := json.Marshal(e)
