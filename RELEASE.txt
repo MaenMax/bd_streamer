@@ -1,3 +1,6 @@
+2020/11/23 17:09 Maen v1.0.4
+  *Bug 110306 - correcting-financier-events.r=Raffi
+
 2020/11/10 04:48 Maen v1.0.3
   * Bug 107952 - correcting current month function. r=Raffi
 
