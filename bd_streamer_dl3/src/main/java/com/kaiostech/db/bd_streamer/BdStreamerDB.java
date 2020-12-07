@@ -110,7 +110,8 @@ public class BdStreamerDB{
 	long ts = System.currentTimeMillis();  //Epoch time in seconds.
 	
 	//Calculating cursor value based on event ID.
-	int cursor = Base64Cursor.strToInt(eventId);
+	//Maen: Bug 111740. Changing the range of cursor values (0-63).
+	long cursor = Base64Cursor.strToNLong(eventId,1);
 
 	// Preparing the INSERT query
 	query.put("cursor", cursor);
