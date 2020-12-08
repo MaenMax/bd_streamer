@@ -1,3 +1,6 @@
+2020/12/07 10:58 Maen v1.0.6
+  * Bug 111740 - cursor value is too big. r=Raffi
+
 2020/11/24 14:52 sedwards v1.0.5
   * Bug 109689 - Add bd_streamer to CI/CD r=Maen
 
