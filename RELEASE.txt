@@ -4,6 +4,12 @@
 2020/11/24 14:52 sedwards v1.0.5
   * Bug 109689 - Add bd_streamer to CI/CD r=Maen
 
+  * Tables to be created:
+
+    CREATE TABLE  kaicloud.bd_stream_yyyy_mm (cursor int, ts timestamp, event_id text,schema_version int,data blob, PRIMARY KEY (cursor,ts,event_id)) WITH CLUSTERING ORDER BY (ts ASC,event_id ASC); 
+
+    A new table needs to be created for each rolling month. That process will be handled by an operational script that runs in a cronjob.
+
 2020/11/23 17:09 Maen v1.0.4
   *Bug 110306 - correcting-financier-events.r=Raffi
 
